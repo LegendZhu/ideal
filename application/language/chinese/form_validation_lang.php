@@ -1,0 +1,31 @@
+<?php
+$lang['file_md5_id'] = '文件id';
+$lang['file_md5_id_error'] = '文件id不能为空';
+$lang['not_valid_params'] = '参数错误';
+$lang['params_unable'] = '参数值未通过';
+$lang['params_lost'] = '参数丢失';
+$lang['file_md5_id_error'] = '文件id不能为空';
+
+$lang['required']			= "字段%s必须填写";
+$lang['isset']				= "字段%s必须指定值.";
+$lang['valid_email']		= "字段%s必须包含一个合法的邮箱地址.";
+$lang['valid_emails']		= "字段%s必须包含合法的邮箱地址.";
+$lang['valid_url']			= "字段%s必须包含一个合法的URL地址.";
+$lang['valid_ip']			= "字段%s必须包含一个合法的IP地址.";
+$lang['min_length']			= "字段%s必须包含至少%s个字符.";
+$lang['max_length']			= "字段%s必须包含不大于%s个字符.";
+$lang['exact_length']		= "字段%s必须包含等于%s个字符.";
+$lang['alpha']				= "字段%s只能包含拉丁字母.";
+$lang['alpha_numeric']		= "字段%s只能包含拉丁字母、数字.";
+$lang['alpha_dash']			= "字段%s只能包含拉丁字母、数字、下划线和-.";
+$lang['numeric']			= "字段%s必须包含一个数值.";
+$lang['is_numeric']			= "字段%s必须只包含数值字符.";
+$lang['integer']			= "字段%s必须包含一个整数.";
+$lang['regex_match']		= "The %s field is not in the correct format.";
+$lang['matches']			= "The %s field does not match the %s field.";
+$lang['is_unique'] 			= "The %s field must contain a unique value.";
+$lang['is_natural']			= "The %s field must contain only positive numbers.";
+$lang['is_natural_no_zero']	= "The %s field must contain a number greater than zero.";
+$lang['decimal']			= "The %s field must contain a decimal number.";
+$lang['less_than']			= "字段 %s 必须小于 %s.";
+$lang['greater_than']		= "字段 %s 必须大于 %s.";
