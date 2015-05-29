@@ -21,7 +21,7 @@ class Index extends API_Controller {
     protected $_validate_rules = array(
       'required' => array('true', 'false'),
       'value_equal', 'value_min', 'value_max',
-      'type' => array('is_string', 'is_array', 'is_numeric'),
+      'type' => array('is_string', 'is_array', 'is_numeric', 'is_int', 'is_integer', 'is_bool', 'is_float'),
       'length_equal', 'length_min', 'length_max'
     );
 
@@ -177,17 +177,17 @@ class Index extends API_Controller {
                     $info['api_message'] = $response_arr['error_msg'];
 
                     if ($response_arr['error_code'] !== NULL && $response_arr['error_code'] == 0) {
-                        $info = array('success' => 'TRUE') + $info;
+                        $info = array('api_status' => 'TRUE') + $info;
                     } else {
-                        $info = array('success' => 'FALSE') + $info;
+                        $info = array('api_status' => 'FALSE') + $info;
                     }
 
                     $this->benchmark->mark('validate_start');
                     $info['validate_result'] = $validate_result = $this->validate_response($response_arr, $api['result_data']);
                     $this->benchmark->mark('validate_end');
 
-                    if(isset($validate_result['no_pass']) && is_array($validate_result['no_pass'])){
-                        $info = array('success' => 'FALSE') + $info;
+                    if(isset($validate_result['no_pass']) && is_array($validate_result['no_pass']) && !empty($validate_result['no_pass'])){
+                        $info = array('api_status' => 'FALSE') + $info;
                     }
 
                     $info['validate_result']['no_pass'] = isset($info['validate_result']['no_pass']) ? $info['validate_result']['no_pass'] : '';

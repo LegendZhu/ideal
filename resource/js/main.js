@@ -131,7 +131,7 @@ $("#run_test").click(function () {
         var result_list = result.data;
         $("#result_list").empty();
         if (result_list.length > 0) {
-          var html = "<table class='gridtable'><tr><th>API</th><th>status</th><th>API Code</th><th>API Message</th><th>Http Status Code</th><th>Request time</th><th> </th><th>return message</th></tr>";
+          var html = "<table class='gridtable'><tr><th>API URI</th><th>API Status</th><th>API Code</th><th>API Message</th><th>Http Status Code</th><th>Request time</th><th> </th><th>return message</th></tr>";
           for (var i = 0; i < result_list.length; i++) {
             var validate_result = result_list[i].validate_result;
 
@@ -161,7 +161,7 @@ $("#run_test").click(function () {
 
             html += "<tr><td>"
               + result_list[i].api_uri + "</td><td>"
-              + result_list[i].success + "</td><td>"
+              + result_list[i].api_status + "</td><td>"
               + result_list[i].api_error_code + "</td><td>"
               + result_list[i].api_message + "</td><td>"
               + result_list[i].http_status_code + "</td><td>"

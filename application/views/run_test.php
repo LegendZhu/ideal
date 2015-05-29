@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <link rel="stylesheet" type="text/css" href="../resource/css/main.css">
+    <link rel="stylesheet" type="text/css" href="../resource/css/chosen.min.css">
     <title>Welcome to ideal</title>
 </head>
 <body>
@@ -41,8 +42,7 @@
 
         <p>
         <div id="">
-            <select id="api_list" data-placeholder='Choose some api...' style='width:350px;' multiple
-                    class='chosen-select'>
+            <select id="api_list" data-placeholder='Choose some api...' class='chosen-select' multiple style='width:350px;height: auto;' tabindex="4" >
             </select>
         </div>
         </p>
