@@ -12,7 +12,7 @@ class Index extends API_Controller {
 
     protected $_conf = array();
 
-    protected $_friend_test_base_info = array(
+    protected $_module_test_base_info = array(
         //        'app_id' => 100010000,
       'testing_mode' => 1,
       'super_key' => 'fC0ydNqtdpqwcN0KwFCaZRNMYOBMFVKH',
@@ -91,11 +91,10 @@ class Index extends API_Controller {
         }
     }
 
-    public function api_get(){
+    public function api_get() {
         $data['module_id'] = $this->input->post('module_id');
         if (!empty($data['module_id'])) {
             $api_list = $this->get_api_by_module_id($data['module_id']);
-//            print_r($api_list);
             $this->to_api_message(0, 'ok', $api_list);
         }
     }
@@ -136,12 +135,18 @@ class Index extends API_Controller {
             $data['project_id'] = $this->input->post('project_id');
             $data['module_id'] = $this->input->post('module_id');
             $data['api_id'] = $this->input->post('api_id');
+
+            $format_type = $this->input->post('format_type');
+
             if (empty($data['api_id'])) {
 
             }
 
             $module_info = $this->get_module_by_id($data['module_id']);
+
             $base_url = $module_info['0']['base_url'];
+            $base_param = trim($module_info['0']['base_param']);
+            !empty($base_param) && parse_str($base_param, $this->_module_test_base_info);
 
             $client = new GuzzleHttp\Client();
 
@@ -154,9 +159,15 @@ class Index extends API_Controller {
                     $method = 'get';
                 }
 
-                parse_str($api['query_data'], $query);
+                if ($this->is_json($api['query_data'])) {
+                    $query = $api['query_data'];
+                } else {
+                    parse_str($api['query_data'], $query);
+                    if (is_array($query) && is_array($this->_module_test_base_info)) {
+                        $query = array_merge($query, $this->_module_test_base_info);
+                    }
+                }
 
-                $query = array_merge($query, $this->_friend_test_base_info);
                 $request = $client->createRequest($method, $base_url . '/' . $api['api_uri'], [
                   'body' => $query,
                     //                  'timeout' => 1,
@@ -186,7 +197,7 @@ class Index extends API_Controller {
                     $info['validate_result'] = $validate_result = $this->validate_response($response_arr, $api['result_data']);
                     $this->benchmark->mark('validate_end');
 
-                    if(isset($validate_result['no_pass']) && is_array($validate_result['no_pass']) && !empty($validate_result['no_pass'])){
+                    if (isset($validate_result['no_pass']) && is_array($validate_result['no_pass']) && !empty($validate_result['no_pass'])) {
                         $info = array('api_status' => 'FALSE') + $info;
                     }
 
@@ -202,7 +213,15 @@ class Index extends API_Controller {
 
                 $test_info[] = $info;
             }
-            $this->to_api_message(0, 'ok', $test_info);
+            if (!empty($format_type) || $format_type == 'html') {
+                $data['result_list'] = $test_info;
+                $view = $this->load->view('test_result', $data, TRUE);
+                /*
+                 * todo:insert mail
+                 */
+            } else {
+                $this->to_api_message(0, 'ok', $test_info);
+            }
         } else {
             $data['projects'] = $this->get_project();
             $this->load->view('run_test', $data);
@@ -222,10 +241,10 @@ class Index extends API_Controller {
             $no_pass = array();
             foreach ($rule as $r) {
                 $result = $this->_judge($r['0'], $r['1'], $response_arr);
-                if(isset($result['pass']) && is_array($result['pass'])){
+                if (isset($result['pass']) && is_array($result['pass'])) {
                     $pass = array_merge($pass, $result['pass']);
                 }
-                if(isset($result['no_pass']) && is_array($result['no_pass'])){
+                if (isset($result['no_pass']) && is_array($result['no_pass'])) {
                     $no_pass = array_merge($no_pass, $result['no_pass']);
                 }
             }
@@ -309,9 +328,9 @@ class Index extends API_Controller {
                 $validate_info = array('error_rule' => 'not found', 'rule' => $key, 'value' => $value);
             }
 
-            if($result_status === FALSE){
+            if ($result_status === FALSE) {
                 $result['no_pass'][$field][] = $validate_info;
-            }else{
+            } else {
                 $result['pass'][$field][] = $validate_info;
             }
         }
@@ -376,5 +395,10 @@ class Index extends API_Controller {
         }
         $res = $query->result_array();
         return $res;
+    }
+
+    private function is_json($string) {
+        json_decode($string);
+        return (json_last_error() == JSON_ERROR_NONE);
     }
 }
