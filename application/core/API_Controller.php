@@ -2,20 +2,11 @@
 
 /**
  * API Controller Class
- *
- * This class object is the super class for e-future projects
- *
- * @author    renwenxin@e-future.com.cn
  */
 class API_Controller extends CI_Controller {
 
     public $load;
     public $to_api_message;
-    public $dsr_line;
-    public $skey;
-    private $_enabled_user_login = TRUE;
-    private $_enabled_emloyee_login = TRUE;
-    private $_request_id;
 
     public function __construct() {
         parent::__construct();
@@ -49,13 +40,6 @@ class API_Controller extends CI_Controller {
         }
     }
 
-    public function showHTML($template, $data = null) {
-        $base = dirname($_SERVER['SCRIPT_NAME']);
-        $this->load->view('header', array('base' => $base));
-        $this->load->view($template, $data);
-        $this->load->view('footer');
-    }
-
     protected function validate($rules) {
         foreach ($rules as $rule) {
             $this->form_validation->set_rules($rule[0], $this->dsr_line($rule[1]), $rule[2]);
@@ -63,7 +47,7 @@ class API_Controller extends CI_Controller {
         if ($this->form_validation->run() === FALSE) {
             $errors = strip_tags(validation_errors());
             if (!$errors) {
-                return $this->to_api_message(0, $this->dsr_line(array('parameter', 'not', 'exist')));
+                return $this->to_api_message(0, 'parameter not exist');
             }
             return $this->to_api_message(0, $errors);
         }
@@ -90,74 +74,7 @@ class API_Controller extends CI_Controller {
         }
     }
 
-    /**
-     * @method Generate i18n string in formate do-sth-result
-     * @author renwenxin@e-future.com.cn
-     */
-    public function dsr_line($do = '', $sth = '', $result = '', $structure = 'do_sth_result') {
-        return sprintf($this->line($structure), $this->array_to_str($do), $this->array_to_str($sth), $this->array_to_str($result)
-        );
-    }
-
-    /**
-     * @method Get i18n string by name
-     * @author renwenxin@e-future.com.cn
-     */
-    public function line($name) {
-        $this->lang->load('common');
-        $re = $this->lang->line($name);
-        if (!$re)
-            $re = $name;
-        return $re;
-    }
-
-
-    public function get_extra_info($conf = array('request_id', 'ip', 'action', 'uri', 'agent')) {
-        $extra_info = array();
-        foreach ($conf as $c) {
-            switch ($c) {
-                case 'ip':
-                    $this->load->helper('ip');
-                    $ret = getip();
-                    break;
-                case 'request_id':
-                    $ret = $this->_request_id;
-                    break;
-                case 'action':
-                    $ret = $this->router->fetch_method();
-                    break;
-                case 'uri':
-                    $ret = $this->uri->uri_string();
-                    break;
-                case 'agent':
-                    $this->load->helper('agent');
-                    $ret = get_user_agent();
-                    break;
-            }
-            $extra_info[$c] = $ret;
-        }
-        return $extra_info;
-    }
-
-    private function array_to_str($arr) {
-        $str = '';
-        if (!is_array($arr)) {
-            return $this->line($arr);
-        }
-        foreach ($arr as $v) {
-            $str .= $this->line($v);
-        }
-        return $str;
-    }
-
-
-    protected function array_to_string($arr) {
-        return array_to_string($arr);
-    }
 }
-
-// END API_Controller class
-
 /* End of file API_Controller.php */
 /* Location: ./application/core/API_Controller.php */
 
