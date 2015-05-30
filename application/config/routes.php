@@ -41,11 +41,11 @@
 $route['default_controller'] = 'index/project_add';
 $route['404_override'] = '';
 
-$route['add'] = 'index/add';
-
 $route['project_add'] = 'index/project_add';
 $route['module_add'] = 'index/module_add';
 $route['module_get'] = 'index/module_get';
 $route['api_add'] = 'index/api_add';
 
 $route['test_insert'] = 'index/test_insert';
+
+$route['add'] = 'index/add';
