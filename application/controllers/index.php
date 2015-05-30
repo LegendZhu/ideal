@@ -8,7 +8,7 @@ class Index extends API_Controller {
         $this->load->database();
     }
 
-    protected $_allow_get = array('index', 'project_add', 'module_add', 'module_get', 'run_test');
+    protected $_allow_get = array('index', 'project_add', 'module_add', 'module_get', 'run_test', 'api_add', 'api_update', 'api_choose', 'api_delete');
 
     protected $_conf = array();
 
@@ -48,7 +48,9 @@ class Index extends API_Controller {
 
         } else {
             $data['projects'] = $this->get_project();
+            $this->load->view('header');
             $this->load->view('project_add', $data);
+            $this->load->view('footer');
         }
     }
 
@@ -126,7 +128,9 @@ class Index extends API_Controller {
             $data['message'] = 'error:' . $error;
         }
         $data['module_id'] = $this->input->post('module_id');
+        $this->load->view('header');
         $this->load->view('api_add', $data);
+        $this->load->view('footer');
     }
 
     public function run_test() {
@@ -205,7 +209,7 @@ class Index extends API_Controller {
                     $info['validate_result']['pass'] = isset($info['validate_result']['pass']) ? $info['validate_result']['pass'] : '';
 
                 } else {
-//                    $info = array('success' => 'FALSE') + $info;
+                    //                    $info = array('success' => 'FALSE') + $info;
                 }
 
                 $info['request_time'] = $this->benchmark->elapsed_time('request_start', 'request_end');
@@ -224,7 +228,9 @@ class Index extends API_Controller {
             }
         } else {
             $data['projects'] = $this->get_project();
+            $this->load->view('header');
             $this->load->view('run_test', $data);
+            $this->load->view('footer');
         }
     }
 
@@ -361,10 +367,96 @@ class Index extends API_Controller {
         return $new;
     }
 
+    /**
+     * --------------------------------------------------------------------
+     * API 操作
+     * --------------------------------------------------------------------
+     */
+
+    public function api_choose() {
+        $data['projects'] = $this->get_project();
+        $this->load->view('header');
+        $this->load->view('api_choose', $data);
+        $this->load->view('footer');
+    }
+
+    /**
+     * 调整至新增页面
+     */
     public function api_add() {
         $data['module_id'] = $this->input->get('module_id');
+        $this->load->view('header');
         $this->load->view('api_add', $data);
+        $this->load->view('footer');
     }
+
+    /**
+     * 删除指定api
+     */
+    public function api_delete() {
+        $data['api_id'] = $this->input->get('api_id');
+        $rst = $this->delete_api_by_api_id($data['api_id']);
+        if($rst > 0){
+            $data['message'] = '删除成功';
+        }else{
+            $data['message'] = '删除失败';
+        }
+        $data['projects'] = $this->get_project();
+        $this->load->view('header');
+        $this->load->view('api_choose', $data);
+        $this->load->view('footer');
+    }
+
+
+    public function api_update() {
+        $api_id = $this->input->get('api_id');
+        if(empty($api_id)){
+            $api_id = $this->input->post('api_id');
+            if(!empty($api_id)){
+                $data['api_uri'] = $this->input->post('uri');
+                $data['method'] = $this->input->post('method');
+                $data['header_data'] = $this->input->post('header_data');
+                $data['query_data'] = $this->input->post('query_data');
+
+                $validate_field = $this->input->post('validate_field');
+                $validate_rule = $this->input->post('validate_rule');
+
+                $data['result_data']['field'] = $validate_field;
+                $data['result_data']['rule'] = $validate_rule;
+                $data['result_data'] = json_encode($data['result_data']);
+
+                $rst = $this->update_api_by_api_id($api_id, $data);
+                unset($data);
+
+                if($rst > 0){
+                    $data['message'] = '更新成功';
+                }else{
+                    $data['message'] = '更新失败';
+                }
+            }else{
+                $data['message'] = '请求数据异常';
+            }
+        }
+
+        $data['action'] = 'update';
+        $info = $this->get_api_by_api_id($api_id);
+        if(!empty($info) && isset($info['0'])){
+            $data['info'] = $info['0'];
+            $data['module_id'] = $info['0']['module_id'];
+            $data['api_id'] = $info['0']['id'];
+            $data['result_data'] = json_decode($info['0']['result_data'], TRUE);
+        }
+        $this->load->view('header');
+        $this->load->view('api_add', $data);
+        $this->load->view('footer');
+    }
+
+
+    /**
+     * --------------------------------------------------------------------
+     * 查询相关
+     * --------------------------------------------------------------------
+     */
 
     protected function get_project() {
         return $this->_get_result('project');
@@ -372,6 +464,10 @@ class Index extends API_Controller {
 
     protected function get_api_by_module_id($module_id) {
         return $this->_get_result('api', array('module_id' => $module_id));
+    }
+
+    protected function get_api_by_api_id($api_id) {
+        return $this->_get_result('api', array('id' => $api_id));
     }
 
     protected function get_project_by_name($project_name) {
@@ -397,6 +493,66 @@ class Index extends API_Controller {
         return $res;
     }
 
+
+    /**
+     * --------------------------------------------------------------------
+     * 更新相关
+     * --------------------------------------------------------------------
+     */
+
+    protected function update_api_by_api_id($api_id, $data) {
+        return $this->_update_info('api', $data, array('id' => $api_id));
+    }
+
+    private function _update_info($table, $data = array(), $where = array()) {
+        $this->db->update($table, $data, $where);
+        $error = $this->db->_error_message();
+        if($error)
+            return -1;
+        return $this->db->affected_rows();
+    }
+
+
+    /**
+     * --------------------------------------------------------------------
+     * 删除相关
+     * --------------------------------------------------------------------
+     */
+
+    /**
+     * @param $api_id
+     *
+     * @return int
+     */
+    protected function delete_api_by_api_id($api_id) {
+        return $this->_delete_record('api', array('id' => $api_id));
+    }
+
+    /**
+     * @param $table
+     * @param array $where
+     *
+     * @return int
+     */
+    private function _delete_record($table, $where = array()) {
+        $this->db->delete($table, $where);
+        $error = $this->db->_error_message();
+        if ($error)
+            return -1;
+        return $this->db->affected_rows();
+    }
+
+    /**
+     * --------------------------------------------------------------------
+     * 其他
+     * --------------------------------------------------------------------
+     */
+
+    /**
+     * @param $string
+     *
+     * @return bool
+     */
     private function is_json($string) {
         json_decode($string);
         return (json_last_error() == JSON_ERROR_NONE);

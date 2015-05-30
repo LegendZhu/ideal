@@ -39,8 +39,9 @@ $("#submit_module").click(function () {
 
 $("#new_data").click(function () {
   var html_block = '<hr style="border:1px;height:1px"><div id="validate">' +
-    '验证字段:<input type="text" name="validate_field[]" ><br>' +
-    '验证规则:<input type="text" name="validate_rule[]"></br>' +
+    '<hr style="border:1px dotted rgba(7, 6, 7, 0.27)" />' +
+    '<label>验证字段:</label><input type="text" name="validate_field[]" style="width: 240px;"></br></br>' +
+    '<label>验证规则:</label><input type="text" name="validate_rule[]" style="width: 240px;"></br>' +
     '</div>';
   if (confirm('确定新增？')) {
     $("#content").append(html_block);
@@ -147,16 +148,16 @@ $("#run_test").click(function () {
             }
 
             var no_pass = '</br>';
-            if(validate_result.hasOwnProperty('no_pass')){
-            for (var o in validate_result['no_pass']) {
-              no_pass += o
-              no_pass += ":</br>"
-              for (var j = 0; j < validate_result['no_pass'][o].length; j++) {
-                no_pass += validate_result['no_pass'][o][j]['rule']
-                no_pass += "-" + validate_result['no_pass'][o][j]['value']
-                no_pass += "</br>"
+            if (validate_result.hasOwnProperty('no_pass')) {
+              for (var o in validate_result['no_pass']) {
+                no_pass += o
+                no_pass += ":</br>"
+                for (var j = 0; j < validate_result['no_pass'][o].length; j++) {
+                  no_pass += validate_result['no_pass'][o][j]['rule']
+                  no_pass += "-" + validate_result['no_pass'][o][j]['value']
+                  no_pass += "</br>"
+                }
               }
-            }
             }
 
             html += "<tr><td>"
@@ -180,11 +181,34 @@ $("#run_test").click(function () {
   }
 });
 
-function trim(str){
+$("#delete_api").click(function () {
+  var api_id = $("#api_list").val();
+  if (api_id) {
+    if (confirm('确定删除？')) {
+      location.href = './api_delete?api_id=' + api_id;
+      return false;
+    }
+  } else {
+    alert('未选择api');
+    return false;
+  }
+});
+
+$("#update_api").click(function () {
+  var api_id = $("#api_list").val();
+  if (api_id) {
+    location.href = './api_update?api_id=' + api_id;
+  } else {
+    alert('未选择api');
+    return false;
+  }
+});
+
+function trim(str) {
   return str.replace(/(^\s*)|(\s*$)/g, "");
 };
 
-function show(info){
+function show(info) {
   console.log(info);
   var i = $.base64.decode(info);
   alert(i);

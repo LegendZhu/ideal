@@ -1,18 +1,9 @@
-<!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
-<head>
-    <meta charset="utf-8">
-    <link rel="stylesheet" type="text/css" href="../resource/css/main.css">
-    <title>Welcome to ideal</title>
-</head>
-<body>
-
 <div id="container">
     <h1>添加项目&模块</h1>
 
     <div id="body">
         <p>
-            项目：
+            <label>项目:</label>
             <input type="text" name="project_name" id="project">
             <button id="submit_project">新增</button>
         </p>
@@ -20,7 +11,7 @@
     </br>
     <div id="body">
         <p>
-            选择项目：
+            <label>选择项目:</label>
             <select name="project_select" id="project_select">
                 <option></option>
                 <?php
@@ -33,11 +24,20 @@
             </select>
         </p>
         <p>
-        模块名：<input type="text" name="module_name" id="module"></br></br>
-        通用 ：<textarea name="base_param" placeholder="每次请求都会使用的参数，test1=xxx&test2=yyy"></textarea></br></br>
-        基础url：<input type="text" name="base_url" id="url">
-        <button id="submit_module">新增模块</button>
+            <label>模块名称:</label>
+            <input type="text" name="module_name" id="module"></br></br>
+
+            <label>基础URL:</label>
+            <input type="text" name="base_url" id="url"></br></br>
+
+            <label>跟踪邮箱:</label>
+            <input type="text" name="mails" id="mails" placeholder="通知邮箱，多个邮箱使用|分隔" style="width: 200px;"></br></br>
+
+            <label>通用参数:</label>
+            <textarea name="base_param" placeholder="每次请求都会使用的参数，test1=xxx&test2=yyy"></textarea></br></br>
+            <button id="submit_module">新增模块</button>
         </p>
+        <hr>
         <p>
             选择模块添加测试接口：
             <select name="module_select" id="module_select">
@@ -53,14 +53,5 @@
             <button id="add_api">新增API</button>
         </p>
     </div>
+    <br>
 </div>
-
-<p class="footer">
-    Page rendered in <strong>{elapsed_time}</strong> seconds
-</p>
-<?php echo $base = dirname($_SERVER['SCRIPT_NAME']); ?>
-
-<script src="../resource/js/jquery-2.1.4.min.js"></script>
-<script src="../resource/js/main.js"></script>
-</body>
-</html>

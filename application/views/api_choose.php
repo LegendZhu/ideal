@@ -1,7 +1,8 @@
 <div id="container">
-    <h1>运行测试</h1>
+    <h1>修改API</h1>
 
     <div id="body">
+        <span style="color: red"><?php echo !empty($message) ? $message : '' ?></span>
         <p>
             选择项目：
             <select name="project_select" id="project_select">
@@ -17,7 +18,7 @@
         </p>
 
         <p>
-            选择模块运行测试：
+            选择模块：
             <select name="module_select" id="module_select">
                 <option selected value=""></option>
                 <?php
@@ -28,22 +29,19 @@
                 }
                 ?>
             </select>
+            <button id="add_api">新增</button>
         </p>
 
         <p>
         <div id="">
-            <select id="api_list" data-placeholder='Choose some api...' class='chosen-select' multiple style='width:350px;height: auto;' tabindex="4" >
+            <select id="api_list">
             </select>
         </div>
         </p>
 
         <p>
-        <div id="result_list">
-        </div>
-        </p>
-
-        <p>
-            <button id="run_test">运行测试</button>
+            <button id="delete_api">删除</button>
+            <button id="update_api">编辑</button>
         </p>
         </br>
     </div>
