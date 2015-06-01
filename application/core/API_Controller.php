@@ -10,6 +10,8 @@ class API_Controller extends CI_Controller {
 
     public function __construct() {
         parent::__construct();
+
+        $post = $this->input->post();
         $method = $this->router->fetch_method();
 
         $post = $this->input->post();
@@ -21,7 +23,19 @@ class API_Controller extends CI_Controller {
             }
         }
 
+        $get = $this->input->get();
+        if (empty($post)) {
+            $_POST = $get;
+        } else {
+            if (!empty($get)) {
+                $_POST = array_merge($post, $get);
+            }
+        }
+
         $_POST = empty($post) ? $get : $post;
+
+        $this->data_trim($_POST);
+
         if (isset($this->_rules) && !empty($this->_rules[$method])) {
             $this->load->library('form_validation');
             $this->validate($this->_rules[$method]);
@@ -50,6 +64,21 @@ class API_Controller extends CI_Controller {
                 return $this->to_api_message(0, 'parameter not exist');
             }
             return $this->to_api_message(0, $errors);
+        }
+    }
+
+    /**
+     * @param $data
+     */
+    public function data_trim(&$data) {
+        if (!empty($data) and is_array($data)) {
+            foreach ($data as $key => &$value) {
+                if (is_array($value)) {
+                    $this->data_trim($value);
+                } else {
+                    $value = trim($value);
+                }
+            }
         }
     }
 
