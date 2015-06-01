@@ -188,13 +188,17 @@ class Index extends API_Controller {
                 if ($response->getStatusCode() == 200) {
                     $info['original_response'] = base64_encode($response->getBody()->getContents());
                     $response_arr = json_decode($response->getBody(), TRUE);
-                    $info['api_error_code'] = $response_arr['error_code'];
-                    $info['api_message'] = $response_arr['error_msg'];
+                    $info['api_error_code'] = isset($response_arr['error_code']) ? $response_arr['error_code'] : '';
+                    $info['api_message'] = isset($response_arr['error_msg']) ? $response_arr['error_msg'] : '';
 
-                    if ($response_arr['error_code'] !== NULL && $response_arr['error_code'] == 0) {
+                    if(isset($response_arr['error_code'])){
+                        if ($response_arr['error_code'] !== NULL && $response_arr['error_code'] == 0) {
+                            $info = array('api_status' => 'TRUE') + $info;
+                        } else {
+                            $info = array('api_status' => 'FALSE') + $info;
+                        }
+                    }else{
                         $info = array('api_status' => 'TRUE') + $info;
-                    } else {
-                        $info = array('api_status' => 'FALSE') + $info;
                     }
 
                     $this->benchmark->mark('validate_start');
