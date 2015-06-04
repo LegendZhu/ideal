@@ -169,7 +169,7 @@ $("#run_test").click(function () {
               + result_list[i].request_time + "</td><td>"
               + "<div>pass:" + pass + "</div><hr>"
               + "<div style='color: red'>no_pass:" + no_pass + "</div></td>"
-              + "<td><span onclick=" + "show(\'" + result_list[i].original_response + "\')" + ";>查看</span></td><tr>"
+              + "<td><span onclick=" + "alert(\'" + decodeURIComponent(result_list[i].original_response) + "\')" + ";>查看</span></td><tr>"
           }
           html += "</table>";
           $("#result_list").append(html);
