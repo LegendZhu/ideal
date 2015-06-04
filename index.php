@@ -179,6 +179,8 @@ date_default_timezone_set('Asia/Shanghai');
 	// Name of the "system folder"
 	define('SYSDIR', trim(strrchr(trim(BASEPATH, '/'), '/'), '/'));
 
+	// Name of the "root folder"
+	define('ROOTPATH', str_replace('\\', '/', BASEPATH . '../'));
 
 	// The path to the "application" folder
 	if (is_dir($application_folder))
