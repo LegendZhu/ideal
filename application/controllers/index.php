@@ -1,5 +1,5 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
-require ROOT_PATH . '/vendor/autoload.php';
+require ROOTPATH . '/vendor/autoload.php';
 
 class Index extends API_Controller {
 
@@ -186,18 +186,19 @@ class Index extends API_Controller {
                 $info['base_url'] = $base_url;
                 $info['api_uri'] = $api['api_uri'];
                 if ($response->getStatusCode() == 200) {
-                    $info['original_response'] = base64_encode($response->getBody()->getContents());
+                    //                    $info['original_response'] = base64_encode($response->getBody()->getContents());
+                    $info['original_response'] = urlencode($response->getBody()->getContents());
                     $response_arr = json_decode($response->getBody(), TRUE);
                     $info['api_error_code'] = isset($response_arr['error_code']) ? $response_arr['error_code'] : '';
                     $info['api_message'] = isset($response_arr['error_msg']) ? $response_arr['error_msg'] : '';
 
-                    if(isset($response_arr['error_code'])){
+                    if (isset($response_arr['error_code'])) {
                         if ($response_arr['error_code'] !== NULL && $response_arr['error_code'] == 0) {
                             $info = array('api_status' => 'TRUE') + $info;
                         } else {
                             $info = array('api_status' => 'FALSE') + $info;
                         }
-                    }else{
+                    } else {
                         $info = array('api_status' => 'TRUE') + $info;
                     }
 
@@ -221,12 +222,16 @@ class Index extends API_Controller {
 
                 $test_info[] = $info;
             }
-            if (!empty($format_type) || $format_type == 'html') {
-                $data['result_list'] = $test_info;
-                $view = $this->load->view('test_result', $data, TRUE);
-                /*
-                 * todo:insert mail
-                 */
+            if (isset($format_type) && $format_type == 'html') {
+                //                $this->load->view('test_result', $data);
+                foreach($test_info as $i){
+                    $data['result_list'] = $test_info;
+                    if(0 == strcasecmp($i['api_status'], 'FALSE')){
+                        $view = $this->load->view('test_result', $data, TRUE);
+                        log_message('notice', 'send mail to ' . $module_info['0']['user_email']);
+                        $this->send_mail($module_info['0'], $view);
+                    }
+                }
             } else {
                 $this->to_api_message(0, 'ok', $test_info);
             }
@@ -400,9 +405,9 @@ class Index extends API_Controller {
     public function api_delete() {
         $data['api_id'] = $this->input->get('api_id');
         $rst = $this->delete_api_by_api_id($data['api_id']);
-        if($rst > 0){
+        if ($rst > 0) {
             $data['message'] = '删除成功';
-        }else{
+        } else {
             $data['message'] = '删除失败';
         }
         $data['projects'] = $this->get_project();
@@ -414,9 +419,9 @@ class Index extends API_Controller {
 
     public function api_update() {
         $api_id = $this->input->get('api_id');
-        if(empty($api_id)){
+        if (empty($api_id)) {
             $api_id = $this->input->post('api_id');
-            if(!empty($api_id)){
+            if (!empty($api_id)) {
                 $data['api_uri'] = $this->input->post('uri');
                 $data['method'] = $this->input->post('method');
                 $data['header_data'] = $this->input->post('header_data');
@@ -432,19 +437,19 @@ class Index extends API_Controller {
                 $rst = $this->update_api_by_api_id($api_id, $data);
                 unset($data);
 
-                if($rst > 0){
+                if ($rst > 0) {
                     $data['message'] = '更新成功';
-                }else{
+                } else {
                     $data['message'] = '更新失败';
                 }
-            }else{
+            } else {
                 $data['message'] = '请求数据异常';
             }
         }
 
         $data['action'] = 'update';
         $info = $this->get_api_by_api_id($api_id);
-        if(!empty($info) && isset($info['0'])){
+        if (!empty($info) && isset($info['0'])) {
             $data['info'] = $info['0'];
             $data['module_id'] = $info['0']['module_id'];
             $data['api_id'] = $info['0']['id'];
@@ -511,7 +516,7 @@ class Index extends API_Controller {
     private function _update_info($table, $data = array(), $where = array()) {
         $this->db->update($table, $data, $where);
         $error = $this->db->_error_message();
-        if($error)
+        if ($error)
             return -1;
         return $this->db->affected_rows();
     }
@@ -560,5 +565,51 @@ class Index extends API_Controller {
     private function is_json($string) {
         json_decode($string);
         return (json_last_error() == JSON_ERROR_NONE);
+    }
+
+    /**
+     * @param $module_info
+     * @param $str
+     */
+    private function send_mail($module_info, $str) {
+        $mail = new PHPMailer();
+        $mail->isSMTP();
+        $mail->CharSet = 'UTF-8'; //设置邮件的字符编码，这很重要，不然中文乱码
+        $mail->SMTPAuth = true; //开启认证
+        $mail->Port = 465;
+        $mail->Host = "smtp.exmail.qq.com";
+        $mail->Username = "notify@apusapps.com";
+        $mail->Password = "launcher123";
+        $mail->SMTPSecure = 'ssl';
+        $mail->AddReplyTo("zhuchuanqi@apusapps.com"); //回复地址
+        $mail->From = "notify@apusapps.com";
+        $mail->FromName = "Apus Notify";
+
+        $user_mail = $module_info['user_email'];
+        $this->load->helper('email');
+        if (false === strpos($user_mail, '|') && valid_email($user_mail)) {
+            $mail->AddAddress($user_mail);
+        } else {
+            $mails = explode('|', $user_mail);
+            foreach ($mails as $m) {
+                if (!valid_email($m)) {
+                    log_message('error', 'mail error:' . $m, ' info:' . json_encode($mails));
+                    continue;
+                }
+                $mail->AddAddress($m);
+            }
+        }
+
+        $mail->Subject = $module_info['module_name'] . '出现问题请检查';
+        $mail->Body = $str;
+        //        $mail->WordWrap   = 80; // 设置每行字符串的长度
+        $mail->IsHTML(true);
+        $rst = $mail->Send();
+        if ($rst) {
+            return $rst;
+        } else {
+            //            log_message('error', 'send mail error:' . $mail->ErrorInfo . ', extra:' . json_encode($mail));
+            log_message('error', 'send mail error:' . $mail->ErrorInfo);
+        }
     }
 }

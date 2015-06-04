@@ -1,83 +1,65 @@
-<!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
-<head>
-    <meta charset="utf-8">
-    <link rel="stylesheet" type="text/css" href="../resource/css/main.css">
-    <link rel="stylesheet" type="text/css" href="../resource/css/chosen.min.css">
-    <title>Welcome to ideal</title>
-</head>
-<body>
-
+<body >
 <div id="result_list">
-    <table class="gridtable">
+    <table style="font-family: verdana, arial, sans-serif;font-size: 11px;color: #333333;border-width: 1px;border-color: #666666;border-collapse: collapse;">
         <tbody>
         <tr>
-            <th>API URI</th>
-            <th>API Status</th>
-            <th>API Code</th>
-            <th>API Message</th>
-            <th>Http Status Code</th>
-            <th>Request time</th>
-            <th></th>
-            <th>return message</th>
+            <th style="border-width: 1px;padding: 2px;border-style: solid;border-color: #666666;background-color: #dedede;">API URI</th>
+            <th style="border-width: 1px;padding: 2px;border-style: solid;border-color: #666666;background-color: #dedede;">API Status</th>
+            <th style="border-width: 1px;padding: 2px;border-style: solid;border-color: #666666;background-color: #dedede;">API Code</th>
+            <th style="border-width: 1px;padding: 2px;border-style: solid;border-color: #666666;background-color: #dedede;">API Message</th>
+            <th style="border-width: 1px;padding: 2px;border-style: solid;border-color: #666666;background-color: #dedede;">Http Status Code</th>
+            <th style="border-width: 1px;padding: 2px;border-style: solid;border-color: #666666;background-color: #dedede;">Request time</th>
+            <th style="border-width: 1px;padding: 2px;border-style: solid;border-color: #666666;background-color: #dedede;"></th>
+            <th style="border-width: 1px;padding: 2px;border-style: solid;border-color: #666666;background-color: #dedede;">return message</th>
         </tr>
         <?php
             if($result_list && is_array($result_list)){
                 foreach($result_list as $key => $result){
         ?>
         <tr>
-            <td><?php echo $result['api_uri']; ?></td>
-            <td><?php echo $result['api_status']; ?></td>
-            <td><?php echo $result['api_error_code']; ?></td>
-            <td><?php echo $result['api_message']; ?></td>
-            <td><?php echo $result['http_status_code']; ?></td>
-            <td><?php echo $result['request_time']; ?></td>
-            <td>
+            <td style="border-width: 1px;padding: 2px;border-style: solid;border-color: #666666;background-color: #ffffff;"><?php echo $result['api_uri']; ?></td>
+            <td style="border-width: 1px;padding: 2px;border-style: solid;border-color: #666666;background-color: #ffffff;"><?php echo $result['api_status']; ?></td>
+            <td style="border-width: 1px;padding: 2px;border-style: solid;border-color: #666666;background-color: #ffffff;"><?php echo $result['api_error_code']; ?></td>
+            <td style="border-width: 1px;padding: 2px;border-style: solid;border-color: #666666;background-color: #ffffff;"><?php echo $result['api_message']; ?></td>
+            <td style="border-width: 1px;padding: 2px;border-style: solid;border-color: #666666;background-color: #ffffff;"><?php echo $result['http_status_code']; ?></td>
+            <td style="border-width: 1px;padding: 2px;border-style: solid;border-color: #666666;background-color: #ffffff;"><?php echo $result['request_time']; ?></td>
+            <td style="border-width: 1px;padding: 2px;border-style: solid;border-color: #666666;background-color: #ffffff;">
                 <div>
-                    pass:<br>
+                    pass:
                     <?php
                         if(isset($result['validate_result']['pass']) && is_array($result['validate_result']['pass'])){
                             $pass = $result['validate_result']['pass'];
                             foreach($pass as $filed => $filed_value){
-                                echo $filed . ':</br>';
+                                echo '<br>' .$filed . ':';
                                 foreach($filed_value as $v){
-                                    echo $v['rule'] . ' - ' . $v['value'] . '</br>';
+                                    echo $v['rule'] . '-' . $v['value'] . ';';
                                 }
                             }
                         }
                     ?>
                 </div>
-                <hr>
                 <div style="color: red">
-                    no_pass:<br>
                     <?php
-                    if(isset($result['validate_result']['no_pass']) && is_array($result['validate_result']['no_pass'])){
+                    if(isset($result['validate_result']['no_pass']) && is_array($result['validate_result']['no_pass']) && !empty($result['validate_result']['no_pass'])){
+                        echo '<hr>no_pass:';
                         $pass = $result['validate_result']['no_pass'];
                         foreach($pass as $filed => $filed_value){
-                            echo $filed . ':</br>';
+                            echo '<br>' .$filed . ':';
                             foreach($filed_value as $v){
-                                echo $v['rule'] . ' - ' . $v['value'] . '</br>';
+                                echo $v['rule'] . '-' . $v['value'] . ';';
                             }
                         }
                     }
                     ?>
                 </div>
             </td>
-            <td><span
-                  onclick="show('<?= $result['original_response'] ?>');">查看</span>
+            <td style="border-width: 1px;padding: 2px;border-style: solid;border-color: #666666;background-color: #ffffff;"><span title='<?php echo urldecode($result['original_response']); ?>'>查看</span>
             </td>
         </tr>
         <?php
             }
-            }
+        }
         ?>
         </tbody>
     </table>
 </div>
-
-<script src="../resource/js/jquery-2.1.4.min.js"></script>
-<script src="../resource/js/chosen.jquery.min.js"></script>
-<script src="../resource/js/jquery.base64.js"></script>
-<script src="../resource/js/main.js"></script>
-</body>
-</html>
